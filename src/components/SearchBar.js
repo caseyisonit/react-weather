@@ -4,7 +4,7 @@ import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
 const SearchBar = props => {
 
     return (
-        <Form inline>
+        <Form inline onSubmit={props.handleFormSubmit}>
             <FormGroup>
                 <Label for="searchTerm" hidden>Search by Location</Label>
                 <Input
@@ -16,7 +16,7 @@ const SearchBar = props => {
                     onChange={props.handleInputChange}
                     />
             </FormGroup>
-            <Button onClick={props.handleFormSubmit}>Submit</Button>
+            <Button onClick={props.handleFormSubmit}>Search</Button>
         </Form>
     );
 }

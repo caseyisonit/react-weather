@@ -1,22 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import moment from 'moment';
 import SearchBar from './components/SearchBar';
 import DayCard from './components/DayCard';
 import DayDetails from './components/DayDetails';
-import sampleData from './data/sample.json';
+import API from './utils/API';
 
 const App = () => {
-  // const [day, setDay] = useState("Monday");
-
   const [data, setData] = useState({
-    days: sampleData.data,
-    location: "Denver, CO",
+    days: [],
+    location: "",
     selectedDay: null,
     searchTerm: ""
   });
 
   const { days, location, selectedDay, searchTerm } = data;
+
+  //only on intial render, trigger getWeather with Denver, CO
+  useEffect(() => {
+    getWeather("Denver, CO");
+  }, []);
+
+  useEffect(() => {
+    document.title = `This Week's Weather ${location ? "for " + location : ""}`
+  }, [location])
+
+  const getWeather = city => {
+    API.getWeather(city)
+    .then(res => {
+      console.log(res);
+      setData({
+        searchTerm: "",
+        selectedDay: null,
+        days: res.data.data,
+        location: res.data.city_name + ", " + res.data.state_code
+      })
+    })
+    .catch(err => console.log(err));
+  }
 
   const setSelectedDay = day => {
     setData({
@@ -34,13 +55,18 @@ const App = () => {
 
   const handleFormSubmit = event => {
     event.preventDefault();
+    if (searchTerm) {
+      getWeather(searchTerm)
+    } else {
+      alert("You must type a city to search")
+    };
 
   }
 
   return (
     <Container>
       <Row>
-        <Col md={8}><h1>Weather for Somewhere</h1></Col>
+        <Col md={8}><h1>Weather for {location}</h1></Col>
         <Col md={4}><SearchBar
           handleInputChange={handleInputChange}
           searchTerm={searchTerm}
